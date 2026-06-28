@@ -44,18 +44,14 @@ export async function register(formData: FormData) {
 export async function loginConGoogle() {
   const supabase = await createClient()
 
-  // 🔍 Agregamos los logs de depuración para verlos en Vercel
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-  console.log('--- DEBBUG AUTH GOOGLE ---')
-  console.log('SITE_URL:', siteUrl)
-  console.log('redirectTo:', `${siteUrl}/auth/callback`)
-  console.log('--------------------------')
+  const isProd = process.env.NODE_ENV === 'production'
+  const redirectTo = isProd
+    ? 'https://devgadgets.vercel.app/auth/callback'
+    : 'http://localhost:3000/auth/callback'
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: {
-      redirectTo: `${siteUrl}/auth/callback`,
-    },
+    options: { redirectTo },
   })
 
   if (error) redirect(`/login?error=${encodeURIComponent(error.message)}`)
